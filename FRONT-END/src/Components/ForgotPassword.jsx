@@ -1,12 +1,19 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
+  const navigate = useNavigate();
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Add your forgot password logic here, e.g., sending a reset link to the email
-    console.log('Forgot Password submitted:', { email });
+
+    if (email === 'admin@example.com') {
+      navigate('/resetpassword', );
+    }
+    
   };
 
   return (
@@ -30,7 +37,7 @@ const ForgotPassword = () => {
                     required
                   />
                 </div>
-                <button type="submit" className="btn btn-primary">Submit</button>
+                <button type="submit" className="btn btn-primary">Send OTP</button>
               </form>
             </div>
           </div>
@@ -41,3 +48,5 @@ const ForgotPassword = () => {
 };
 
 export default ForgotPassword;
+
+

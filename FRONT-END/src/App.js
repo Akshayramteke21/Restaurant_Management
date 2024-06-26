@@ -7,6 +7,7 @@ import Register from './Components/Register';
 import AdminPage from './Pages/AdminPage'
 import StaffPage from './Pages/StaffPage';
 import ForgotPassword from './Components/ForgotPassword';
+import ResetPassword from './Components/ResetPassword';
 import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css'
 
@@ -22,6 +23,7 @@ function App() {
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/staff" element={<StaffPage />} />
         <Route path="/forgotpassword" element={<ForgotPassword/>}/>
+        <Route path='/resetpassword' element={<ResetPassword/>} />
       </Routes>
     </div>
   );

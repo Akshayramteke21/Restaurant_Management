@@ -7,8 +7,8 @@ const Home = () => (
   <div>
     <div className="jumbotron jumbotron-fluid text-white bg-dark">
       <div className="container text-center">
-        <h1 className="display-4">Welcome to Our Restaurant</h1>
-        <p className="lead">Experience the best food </p>
+        <h1 className="display-2">Welcome to Our Restaurant</h1>
+        <p className="lead">Dine, Deliver, Delight: Your Culinary Journey Starts Here </p>
       </div>
     </div>
 
