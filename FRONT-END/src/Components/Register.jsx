@@ -1,17 +1,52 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [contact, setContact] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [role, setRole] = useState('Staff');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [contact, setContact] = useState("");
+  const [password, setPassword] = useState("");
+  const [msg, setMsg] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [role, setRole] = useState("Staff");
+  const [data, setData] = useState({
+    name: " ",
+    email: " ",
+    contact: " ",
+    pasword: " ",
+    role: "",
+  });
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
+    const { name, email, contact, password, confirmPassword, role } = data;
+
+    if (password !== confirmPassword) {
+      setMsg("Passwords do not match");
+      return;
+    }
+
+    try {
+      const response = await axios.post("http://localhost:8080/registerUser", {
+        name,
+        email,
+        contact,
+        password,
+        role,
+      });
+      if (response.status === 200) {
+        setMsg("Registration successful...");
+        navigate("/login");
+      } else {
+        throw new Error("Failed to register");
+      }
+    } catch (error) {
+      console.log(error);
+      setMsg("An error occurred during registration");
+    }
   };
 
   return (
@@ -21,13 +56,15 @@ const Register = () => {
           <div className="card"></div>
           <div className="bg-white p-4 rounded border shadow">
             <div className="mb-4">
-            <div className="card-header">
-              <h2>Register</h2>
+              <div className="card-header">
+                <h2>Register</h2>
               </div>
-              </div>
+            </div>
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
-                <label htmlFor="name" className="form-label">Name:</label>
+                <label htmlFor="name" className="form-label">
+                  Name:
+                </label>
                 <input
                   type="text"
                   className="form-control"
@@ -38,7 +75,9 @@ const Register = () => {
                 />
               </div>
               <div className="mb-3">
-                <label htmlFor="email" className="form-label">Email:</label>
+                <label htmlFor="email" className="form-label">
+                  Email:
+                </label>
                 <input
                   type="email"
                   className="form-control"
@@ -49,7 +88,9 @@ const Register = () => {
                 />
               </div>
               <div className="mb-3">
-                <label htmlFor="contact" className="form-label">Contact:</label>
+                <label htmlFor="contact" className="form-label">
+                  Contact:
+                </label>
                 <input
                   type="text"
                   className="form-control"
@@ -60,7 +101,9 @@ const Register = () => {
                 />
               </div>
               <div className="mb-3">
-                <label htmlFor="password" className="form-label">Password:</label>
+                <label htmlFor="password" className="form-label">
+                  Password:
+                </label>
                 <input
                   type="password"
                   className="form-control"
@@ -71,7 +114,9 @@ const Register = () => {
                 />
               </div>
               <div className="mb-3">
-                <label htmlFor="confirmPassword" className="form-label">Confirm Password:</label>
+                <label htmlFor="confirmPassword" className="form-label">
+                  Confirm Password:
+                </label>
                 <input
                   type="password"
                   className="form-control"
@@ -82,7 +127,9 @@ const Register = () => {
                 />
               </div>
               <div className="mb-3">
-                <label htmlFor="role" className="form-label">Role:</label>
+                <label htmlFor="role" className="form-label">
+                  Role:
+                </label>
                 <select
                   className="form-select"
                   id="role"
@@ -94,8 +141,10 @@ const Register = () => {
                   <option value="admin">Admin</option>
                 </select>
               </div>
-             
-              <button type="submit" className="btn btn-primary w-100">Register</button>
+
+              <button type="submit" className="btn btn-primary w-100">
+                Register
+              </button>
             </form>
           </div>
         </div>
