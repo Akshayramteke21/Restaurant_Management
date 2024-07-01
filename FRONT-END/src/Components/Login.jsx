@@ -1,38 +1,42 @@
-import axios from 'axios';
-import React, { useState } from 'react';
-
-import { useNavigate, Link } from 'react-router-dom';
-
+import { logDOM } from "@testing-library/react";
+import axios from "axios";
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit =  async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    
-    if (email === 'admin@example.com' && password === 'admin123') {
-      navigate('/admin');
-    } else if (email === 'staff@example.com' && password === 'staff123') {
-      navigate('/staff');
-    } else {
-      setError('Invalid email or password');
+    try {
+      const response = await axios.post("http://localhost:8080/login", {
+        email,
+        password
+      });
+
+      if (response.status === 200) {
+       
+        const { role } = response.data;
+
+        if (role === "admin") {
+          navigate("/admin");
+        } else if (role === "staff") {
+          navigate("/staff");
+        } else {
+          setError("Invalid role");
+        }
+      } else {
+        setError("Invalid email or password");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("An error occurred. Please try again later.");
     }
   };
-
-  try { 
-
-    
-  } catch (error) {
-    
-  }
-
-
-  
-
 
   return (
     <div className="container mt-5">
@@ -45,7 +49,9 @@ const Login = () => {
             <div className="card-body">
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">
-                  <label htmlFor="email" className="form-label">Email:</label>
+                  <label htmlFor="email" className="form-label">
+                    Email:
+                  </label>
                   <input
                     type="email"
                     className="form-control"
@@ -56,7 +62,9 @@ const Login = () => {
                   />
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="password" className="form-label">Password:</label>
+                  <label htmlFor="password" className="form-label">
+                    Password:
+                  </label>
                   <input
                     type="password"
                     className="form-control"
@@ -67,7 +75,9 @@ const Login = () => {
                   />
                 </div>
                 {error && <div className="alert alert-danger">{error}</div>}
-                <button type="submit" className="btn btn-primary">Login</button>
+                <button type="submit" className="btn btn-primary">
+                  Login
+                </button>
                 <div className="mt-3">
                   <Link to="/forgotpassword">Forgot Password?</Link>
                 </div>

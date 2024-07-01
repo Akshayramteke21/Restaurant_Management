@@ -1,3 +1,5 @@
+
+
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -7,22 +9,13 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [contact, setContact] = useState("");
   const [password, setPassword] = useState("");
-  const [msg, setMsg] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [role, setRole] = useState("Staff");
-  const [data, setData] = useState({
-    name: " ",
-    email: " ",
-    contact: " ",
-    pasword: " ",
-    role: "",
-  });
+  const [roll, setRoll] = useState("");
+  const [msg, setMsg] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const { name, email, contact, password, confirmPassword, role } = data;
 
     if (password !== confirmPassword) {
       setMsg("Passwords do not match");
@@ -35,8 +28,10 @@ const Register = () => {
         email,
         contact,
         password,
-        role,
+        roll: { id: roll },
+        status: 1,
       });
+
       if (response.status === 200) {
         setMsg("Registration successful...");
         navigate("/login");
@@ -60,6 +55,7 @@ const Register = () => {
                 <h2>Register</h2>
               </div>
             </div>
+            {msg && <p>{msg}</p>}
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
                 <label htmlFor="name" className="form-label">
@@ -127,21 +123,22 @@ const Register = () => {
                 />
               </div>
               <div className="mb-3">
-                <label htmlFor="role" className="form-label">
+                <label htmlFor="roll" className="form-label">
                   Role:
                 </label>
                 <select
                   className="form-select"
-                  id="role"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
+                  id="roll"
+                  value={roll}
+                  onChange={(e) => setRoll(e.target.value)}
                   required
                 >
-                  <option value="staff">Staff</option>
-                  <option value="admin">Admin</option>
+                  <option value="">Select a role</option>
+                  <option value="1">Staff</option>
+                  <option value="2">Admin</option>
                 </select>
               </div>
-
+              <input type="hidden" id="status" value="1" />
               <button type="submit" className="btn btn-primary w-100">
                 Register
               </button>
