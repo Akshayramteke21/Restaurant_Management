@@ -1,19 +1,47 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const ForgotPassword = () => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true)
+    setMessage("");
 
-    if (email === 'admin@example.com') {
-      navigate('/resetpassword', );
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/forgetPasswordSet" ,
+        { email }
+      );
+
+      if (response.status === 200) {
+        setMessage("OTP sent successfully. Check your email.");
+
+        setTimeout(() => navigate("/resetpassword"), 2000);
+      } else {
+        setMessage("An unexpected error occurred. Please try again.");
+      }
+    } catch (error) {
+      if (error.response) {
+        setMessage(
+          error.response.data.message || "An error occurred. Please try again."
+        );
+      } else if (error.request) {
+        setMessage(
+          "No response from server. Please check your connection and try again."
+        );
+      } else {
+        setMessage("An error occurred. Please try again.");
+      }
+      console.error("Error:", error);
+    } finally {
+      setIsLoading(false);
     }
-    
   };
 
   return (
@@ -22,12 +50,15 @@ const ForgotPassword = () => {
         <div className="col-md-6">
           <div className="card">
             <div className="card-header">
-              <h2>Forgot Password</h2>
+              <h2>Reset Password</h2>
             </div>
             <div className="card-body">
+              {message && <div className="alert alert-info">{message}</div>}
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">
-                  <label htmlFor="email" className="form-label">Email:</label>
+                  <label htmlFor="email" className="form-label">
+                    Email address:
+                  </label>
                   <input
                     type="email"
                     className="form-control"
@@ -35,9 +66,19 @@ const ForgotPassword = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    aria-describedby="emailHelp"
                   />
+                  <div id="emailHelp" className="form-text">
+                    We'll send a one-time password to this email.
+                  </div>
                 </div>
-                <button type="submit" className="btn btn-primary">Send OTP</button>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Sending..." : "Send OTP"}
+                </button>
               </form>
             </div>
           </div>
@@ -48,5 +89,3 @@ const ForgotPassword = () => {
 };
 
 export default ForgotPassword;
-
-

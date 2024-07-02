@@ -34,7 +34,7 @@ const Register = () => {
 
       if (response.status === 200) {
         setMsg("Registration successful...");
-        navigate("/login");
+        navigate("/emailVerification");
       } else {
         throw new Error("Failed to register");
       }
