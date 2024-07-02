@@ -10,6 +10,7 @@ import ForgotPassword from './Components/ForgotPassword';
 import ResetPassword from './Components/ResetPassword';
 import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css'
+import EmailVerification from './Components/EmailVerification';
 
 
 function App() {
@@ -20,10 +21,12 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/staff" element={<StaffPage />} />
         <Route path="/forgotpassword" element={<ForgotPassword/>}/>
         <Route path='/resetpassword' element={<ResetPassword/>} />
+        <Route path='/emailverification' element ={<EmailVerification/>} />
       </Routes>
     </div>
   );
