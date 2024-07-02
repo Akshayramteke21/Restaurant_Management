@@ -1,24 +1,28 @@
 import React, { useState } from 'react';
-
 import { useNavigate, Link } from 'react-router-dom';
-
+import MainService from '../Services/MainService';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
-    
-    if (email === 'admin@example.com' && password === 'admin123') {
-      navigate('/admin');
-    } else if (email === 'staff@example.com' && password === 'staff123') {
-      navigate('/staff');
-    } else {
-      setError('Invalid email or password');
+    try {
+      const response = await MainService.authenticateUser(email, password);
+
+      if (response) {
+        sessionStorage.setItem('user', JSON.stringify(response));
+        navigate('/admin');
+        setError("");
+      } else {
+        setError("Login failed. Please check your email and password.");
+      }
+    } catch (error) {
+      setError("An error occurred. Please try again.");
     }
   };
 
@@ -31,6 +35,7 @@ const Login = () => {
               <h2>Login</h2>
             </div>
             <div className="card-body">
+              
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                   <label htmlFor="email" className="form-label">Email:</label>
@@ -38,6 +43,7 @@ const Login = () => {
                     type="email"
                     className="form-control"
                     id="email"
+                    name="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -49,6 +55,7 @@ const Login = () => {
                     type="password"
                     className="form-control"
                     id="password"
+                    name="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required

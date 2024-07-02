@@ -1,17 +1,81 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import MainService from '../Services/MainService';
 
 const Register = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [contact, setContact] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [role, setRole] = useState('Staff');
+  const navigate = useNavigate();
+  const [validated, setValidated] = useState(false);
+  const [user, setUser] = useState({
+    name: "",
+    email: "",
+    contact: "",
+    password: "",
+    confirmPassword: "",
+    otp: "",
+    status: "",
+    role: {
+      id: ""
+    }
+  });
+  const [roles, setRoles] = useState([]);
+  const [msg, setMsg] = useState("");
+  const [msgType, setMsgType] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
+  useEffect(() => {
+    MainService.getRoles()
+      .then(response => {
+        console.log("Role fetched:", response.data); // check in console data role all
+        setRoles(response.data);
+      })
+      .catch(error => {
+        console.error("Error fetching roles:", error);
+      });
+  }, []);
+
+  const handleText = (event) => {
+    const { name, value } = event.target;
+    if (name === "role") {
+      setUser(prevState => ({
+        ...prevState,
+        role: {
+          ...prevState.role,
+          id: value
+        }
+      }));
+    } else {
+      setUser(prevState => ({
+        ...prevState,
+        [name]: value
+      }));
+    }
+  };
+
+  const saveUser = (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    if (form.checkValidity() === false || user.password !== user.confirmPassword) {
+      event.stopPropagation();
+      if (user.password !== user.confirmPassword) {
+        setMsg("Passwords do not match.");
+        setMsgType("error");
+      }
+    } else {
+      MainService.AddUser(user)
+        .then((res) => {
+          setMsg(res.data);
+          setMsgType("success");
+          console.log("User added:", res.data);
+          setTimeout(() => {
+            navigate('/register'); // Redirect to success page after a short delay
+          }, 2000);
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          setMsg("Failed to add User. Please try again.");
+          setMsgType("error");
+        });
+    }
+    setValidated(true);
   };
 
   return (
@@ -21,19 +85,21 @@ const Register = () => {
           <div className="card"></div>
           <div className="bg-white p-4 rounded border shadow">
             <div className="mb-4">
-            <div className="card-header">
-              <h2>Register</h2>
+              <div className="card-header">
+                <h2>Register</h2>
               </div>
-              </div>
-            <form onSubmit={handleSubmit}>
+            </div>
+            <form onSubmit={saveUser} noValidate>
               <div className="mb-3">
                 <label htmlFor="name" className="form-label">Name:</label>
                 <input
                   type="text"
                   className="form-control"
                   id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Enter Name"
+                  name="name"
+                  value={user.name}
+                  onChange={handleText}
                   required
                 />
               </div>
@@ -43,8 +109,10 @@ const Register = () => {
                   type="email"
                   className="form-control"
                   id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter Email"
+                  name="email"
+                  value={user.email}
+                  onChange={handleText}
                   required
                 />
               </div>
@@ -54,8 +122,10 @@ const Register = () => {
                   type="text"
                   className="form-control"
                   id="contact"
-                  value={contact}
-                  onChange={(e) => setContact(e.target.value)}
+                  placeholder="Enter Contact"
+                  name="contact"
+                  value={user.contact}
+                  onChange={handleText}
                   required
                 />
               </div>
@@ -65,8 +135,10 @@ const Register = () => {
                   type="password"
                   className="form-control"
                   id="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter Password"
+                  name="password"
+                  value={user.password}
+                  onChange={handleText}
                   required
                 />
               </div>
@@ -76,8 +148,10 @@ const Register = () => {
                   type="password"
                   className="form-control"
                   id="confirmPassword"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm Password"
+                  name="confirmPassword"
+                  value={user.confirmPassword}
+                  onChange={handleText}
                   required
                 />
               </div>
@@ -86,15 +160,24 @@ const Register = () => {
                 <select
                   className="form-select"
                   id="role"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
+                  name="role"
+                  value={user.role.id}
+                  onChange={handleText}
                   required
                 >
-                  <option value="staff">Staff</option>
-                  <option value="admin">Admin</option>
+                  <option value="">Select Role</option>
+                  {roles.map((role) => (
+                    <option key={role.id} value={role.id}>
+                      {role.role}
+                    </option>
+                  ))}
                 </select>
               </div>
-             
+              {msg && (
+                <div className={`alert ${msgType === "success" ? "alert-success" : "alert-danger"}`}>
+                  {msg}
+                </div>
+              )}
               <button type="submit" className="btn btn-primary w-100">Register</button>
             </form>
           </div>
