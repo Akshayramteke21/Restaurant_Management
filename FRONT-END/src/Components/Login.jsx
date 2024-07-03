@@ -1,13 +1,6 @@
-<<<<<<< HEAD
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import MainService from '../Services/MainService';
-=======
-import { logDOM } from "@testing-library/react";
-import axios from "axios";
-import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
->>>>>>> ced130dd563e5ae97045f75f8efbc279e69743d6
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -15,7 +8,7 @@ const Login = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-<<<<<<< HEAD
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -31,34 +24,6 @@ const Login = () => {
       }
     } catch (error) {
       setError("An error occurred. Please try again.");
-=======
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    try {
-      const response = await axios.post("http://localhost:8080/login", {
-        email,
-        password
-      });
-
-      if (response.status === 200) {
-       
-        const { role } = response.data;
-
-        if (role === "admin") {
-          navigate("/admin");
-        } else if (role === "staff") {
-          navigate("/staff");
-        } else {
-          setError("Invalid role");
-        }
-      } else {
-        setError("Invalid email or password");
-      }
-    } catch (err) {
-      console.error(err);
-      setError("An error occurred. Please try again later.");
->>>>>>> ced130dd563e5ae97045f75f8efbc279e69743d6
     }
   };
 

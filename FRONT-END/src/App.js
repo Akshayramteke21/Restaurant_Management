@@ -25,8 +25,8 @@ function App() {
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/staff" element={<StaffPage />} />
         <Route path="/forgotpassword" element={<ForgotPassword/>}/>
-        <Route path='/resetpassword' element={<ResetPassword/>} />
-        <Route path='/emailverification' element ={<EmailVerification/>} />
+        <Route path="/resetpassword" element={<ResetPassword/>} />
+        <Route path="/emailverification" element ={<EmailVerification/>} />
       </Routes>
     </div>
   );

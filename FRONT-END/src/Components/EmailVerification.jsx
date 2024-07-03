@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import MainService from '../Services/MainService'; // Adjust the path as necessary
 
 const EmailVerification = () => {
   const [otp, setOtp] = useState('');
@@ -21,12 +21,9 @@ const EmailVerification = () => {
       return;
     }
     try {
-      const response = await axios.post("http://localhost:8080/verifyAccount", {
-        email: email,
-        otp: otp
-      });
-      
-      if (response.status === 200) {
+      const response = await MainService.verifyAccount(email, otp);
+
+      if (response) {
         setMsg("Account verified successfully");
         setTimeout(() => navigate('/login'), 2000);
       } else {
@@ -62,6 +59,7 @@ const EmailVerification = () => {
                   type="text"
                   className="form-control"
                   id="otp"
+                  name="otp"
                   value={otp}
                   onChange={handleOtpChange}
                   placeholder="Enter the OTP sent to your email"

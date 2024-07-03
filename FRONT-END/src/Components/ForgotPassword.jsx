@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import MainService from "../Services/MainService";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -10,19 +10,16 @@ const ForgotPassword = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true)
+    setIsLoading(true);
     setMessage("");
 
     try {
-      const response = await axios.post(
-        "http://localhost:8080/forgetPasswordSet" ,
-        { email }
-      );
+      const response = await MainService.forgotPassword(email);
 
-      if (response.status === 200) {
+      if (response) {
         setMessage("OTP sent successfully. Check your email.");
 
-        setTimeout(() => navigate("/resetpassword"), 2000);
+        setTimeout(() => navigate("/resetpassword", { state: { email } }), 2000);
       } else {
         setMessage("An unexpected error occurred. Please try again.");
       }
