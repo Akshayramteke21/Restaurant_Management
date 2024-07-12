@@ -1,17 +1,16 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import Navbar from './Components/Navbar';
-import Home from './Components/Home';
-import Login from './Components/Login';
-import Register from './Components/Register';
-import AdminPage from './Pages/AdminPage'
-import StaffPage from './Pages/StaffPage';
-import ForgotPassword from './Components/ForgotPassword';
-import ResetPassword from './Components/ResetPassword';
-import './index.css';
-import 'bootstrap/dist/css/bootstrap.min.css'
-import EmailVerification from './Components/EmailVerification';
-
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+import Navbar from "./Components/Navbar";
+import Home from "./Components/Home";
+import Login from "./Components/Login";
+import Register from "./Components/Register";
+import AdminPage from "./Pages/AdminPage";
+import StaffPage from "./Pages/StaffPage";
+import ForgotPassword from "./Components/ForgotPassword";
+import ResetPassword from "./Components/ResetPassword";
+import "./index.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+import EmailVerification from "./Components/EmailVerification";
 
 function App() {
   return (
@@ -24,9 +23,9 @@ function App() {
 
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/staff" element={<StaffPage />} />
-        <Route path="/forgotpassword" element={<ForgotPassword/>}/>
-        <Route path="/resetpassword" element={<ResetPassword/>} />
-        <Route path="/emailverification" element ={<EmailVerification/>} />
+        <Route path="/forgotpassword" element={<ForgotPassword />} />
+        <Route path="/resetpassword" element={<ResetPassword />} />
+        <Route path="/emailverification" element={<EmailVerification />} />
       </Routes>
     </div>
   );

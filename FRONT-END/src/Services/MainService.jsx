@@ -1,6 +1,6 @@
 import axios from "axios";
 
-//backendproject name : ResturantApp
+
 const API_URL = "http://localhost:8080";
 
 const MainService = {
@@ -37,7 +37,22 @@ const MainService = {
       console.error("Error verifying account:", error);
       throw error;
     }
+  }, 
+
+  getCaptcha: async (captcha)=>{
+
+    try {
+      const response= await axios.get(`${API_URL}/getCaptcha`,{captcha});
+
+    console.log(response);
+    return response.data.captcha;
+      
+    } catch (error) {
+      console.error("Error getting captcha:", error);
+      throw error;
+    }
   },
+  
 
   // Forgot password
   forgotPassword: async (email) => {

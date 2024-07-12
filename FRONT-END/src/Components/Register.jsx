@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import MainService from '../Services/MainService';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import MainService from "../Services/MainService";
 
 const Register = () => {
   const navigate = useNavigate();
   const [validated, setValidated] = useState(false);
   const [user, setUser] = useState({
-    name: "",
+    FirstName: "",
+    MiddleName: "",
+    LastName: "",
     email: "",
     contact: "",
     password: "",
@@ -14,38 +16,51 @@ const Register = () => {
     otp: "",
     status: "",
     role: {
-      id: ""
-    }
+      id: "",
+    },
+    captcha: ""
   });
   const [roles, setRoles] = useState([]);
   const [msg, setMsg] = useState("");
   const [msgType, setMsgType] = useState("");
+  const [captcha, setCaptcha] = useState("");
 
   useEffect(() => {
     MainService.getRoles()
-      .then(response => {
+      .then((response) => {
         console.log("Role fetched:", response.data); // check in console data role all
         setRoles(response.data);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Error fetching roles:", error);
       });
+
+      fetchCaptcha()
   }, []);
+  const fetchCaptcha = () => {
+    MainService.getCaptcha()
+      .then((response) => {
+        setCaptcha(response.data.captcha);
+      })
+      .catch((error) => {
+        console.error("Error fetching CAPTCHA:", error);
+      });
+  };
 
   const handleText = (event) => {
     const { name, value } = event.target;
     if (name === "role") {
-      setUser(prevState => ({
+      setUser((prevState) => ({
         ...prevState,
         role: {
           ...prevState.role,
-          id: value
-        }
+          id: value,
+        },
       }));
     } else {
-      setUser(prevState => ({
+      setUser((prevState) => ({
         ...prevState,
-        [name]: value
+        [name]: value,
       }));
     }
   };
@@ -53,7 +68,10 @@ const Register = () => {
   const saveUser = (event) => {
     event.preventDefault();
     const form = event.currentTarget;
-    if (form.checkValidity() === false || user.password !== user.confirmPassword) {
+    if (
+      form.checkValidity() === false ||
+      user.password !== user.confirmPassword
+    ) {
       event.stopPropagation();
       if (user.password !== user.confirmPassword) {
         setMsg("Passwords do not match.");
@@ -66,7 +84,7 @@ const Register = () => {
           setMsgType("success");
           console.log("User added:", res.data);
           setTimeout(() => {
-            navigate('/emailverification', { state: { email: user.email } }); // Pass email in state
+            navigate("/emailverification", { state: { email: user.email } }); // Pass email in state
           }, 2000);
         })
         .catch((error) => {
@@ -79,32 +97,66 @@ const Register = () => {
   };
 
   return (
-    <div className="container mt-3">
+    <div className="container ">
       <div className="row justify-content-center">
-        <div className="col-md-5">
+        <div className="col-md-6">
           <div className="card"></div>
-          <div className="bg-white p-4 rounded border shadow">
-            <div className="mb-4">
+          <div className="bg-white p-2 rounded border shadow">
+            <div className="mb-2">
               <div className="card-header">
-                <h2>Register</h2>
+                <h2 className=" text-center ">Register</h2>
               </div>
             </div>
             <form onSubmit={saveUser} noValidate>
-              <div className="mb-3">
-                <label htmlFor="name" className="form-label">Name:</label>
+              <div className="mb-2">
+                <label htmlFor="name" className="form-label">
+                  First Name:
+                </label>
                 <input
                   type="text"
                   className="form-control"
-                  id="name"
-                  placeholder="Enter Name"
-                  name="name"
-                  value={user.name}
+                  id="firstname"
+                  placeholder="Enter first name"
+                  name="firstname"
+                  value={user.FirstName}
                   onChange={handleText}
                   required
                 />
               </div>
-              <div className="mb-3">
-                <label htmlFor="email" className="form-label">Email:</label>
+              <div className="mb-2">
+                <label htmlFor="name" className="form-label">
+                  Middle Name:
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="middlename"
+                  placeholder="Enter Middle Name"
+                  name="middlename"
+                  value={user.MiddleName}
+                  onChange={handleText}
+                  required
+                />
+              </div>
+              <div className="mb-2">
+                <label htmlFor="name" className="form-label">
+                  Last Name:
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="lastname"
+                  placeholder="Enter Last name"
+                  name="lastname"
+                  value={user.LastName}
+                  onChange={handleText}
+                  required
+                />
+              </div>
+              <div className="mb-2">
+                <label htmlFor="email" className="form-label">
+                  Email:
+                </label>
                 <input
                   type="email"
                   className="form-control"
@@ -116,8 +168,10 @@ const Register = () => {
                   required
                 />
               </div>
-              <div className="mb-3">
-                <label htmlFor="contact" className="form-label">Contact:</label>
+              <div className="mb-2">
+                <label htmlFor="contact" className="form-label">
+                  Contact:
+                </label>
                 <input
                   type="text"
                   className="form-control"
@@ -129,8 +183,10 @@ const Register = () => {
                   required
                 />
               </div>
-              <div className="mb-3">
-                <label htmlFor="password" className="form-label">Password:</label>
+              <div className="mb-2">
+                <label htmlFor="password" className="form-label">
+                  Password:
+                </label>
                 <input
                   type="password"
                   className="form-control"
@@ -142,8 +198,10 @@ const Register = () => {
                   required
                 />
               </div>
-              <div className="mb-3">
-                <label htmlFor="confirmPassword" className="form-label">Confirm Password:</label>
+              <div className="mb-2">
+                <label htmlFor="confirmPassword" className="form-label">
+                  Confirm Password:
+                </label>
                 <input
                   type="password"
                   className="form-control"
@@ -155,8 +213,14 @@ const Register = () => {
                   required
                 />
               </div>
-              <div className="mb-3">
-                <label htmlFor="role" className="form-label">Role:</label>
+
+              <div className=" mb-2 card-header">
+                
+              </div>
+              <div className="mb-2">
+                <label htmlFor="role" className="form-label">
+                  Role:
+                </label>
                 <select
                   className="form-select"
                   id="role"
@@ -173,12 +237,42 @@ const Register = () => {
                   ))}
                 </select>
               </div>
+              <div className="mb-3">
+                  <label htmlFor="captcha" className="form-label">
+                    CAPTCHA:
+                  </label>
+                  <div className="d-flex align-items-center mb-2">
+                    <span className="me-2 p-2 border rounded bg-light">
+                      {captcha}
+                    </span>
+                    <button type="button" onClick={fetchCaptcha} className="btn btn-secondary btn-sm">
+                      Refresh CAPTCHA
+                    </button>
+                  </div>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="captcha"
+                    placeholder="Enter CAPTCHA"
+                    name="captcha"
+                    value={user.captcha}
+                    onChange={handleText}
+                    required
+                  />
+                </div>
+
               {msg && (
-                <div className={`alert ${msgType === "success" ? "alert-success" : "alert-danger"}`}>
+                <div
+                  className={`alert ${
+                    msgType === "success" ? "alert-success" : "alert-danger"
+                  }`}
+                >
                   {msg}
                 </div>
               )}
-              <button type="submit" className="btn btn-primary w-100">Register</button>
+              <button type="submit" className="btn btn-primary w-100">
+                Register
+              </button>
             </form>
           </div>
         </div>
