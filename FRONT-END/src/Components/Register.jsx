@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import MainService from "../Services/MainService";
+import { loadCaptchaEnginge, LoadCanvasTemplate, validateCaptcha } from 'react-simple-captcha';
+
+
 
 const Register = () => {
   const navigate = useNavigate();
@@ -18,7 +21,7 @@ const Register = () => {
     role: {
       id: "",
     },
-    captcha: ""
+    captcha: "",
   });
   const [roles, setRoles] = useState([]);
   const [msg, setMsg] = useState("");
@@ -35,17 +38,9 @@ const Register = () => {
         console.error("Error fetching roles:", error);
       });
 
-      fetchCaptcha()
+    
   }, []);
-  const fetchCaptcha = () => {
-    MainService.getCaptcha()
-      .then((response) => {
-        setCaptcha(response.data.captcha);
-      })
-      .catch((error) => {
-        console.error("Error fetching CAPTCHA:", error);
-      });
-  };
+  
 
   const handleText = (event) => {
     const { name, value } = event.target;
@@ -95,6 +90,24 @@ const Register = () => {
     }
     setValidated(true);
   };
+
+
+  useEffect(() => {
+    loadCaptchaEnginge(6); 
+}, []);
+
+const doSubmit = () => {
+  let user_captcha = document.getElementById('user_captcha_input').value;
+
+  if (validateCaptcha(user_captcha) === true) {
+      alert('Captcha Matched');
+      loadCaptchaEnginge(6); 
+      document.getElementById('user_captcha_input').value = "";
+  } else {
+      alert('Captcha Does Not Match');
+      document.getElementById('user_captcha_input').value = "";
+  }
+}
 
   return (
     <div className="container ">
@@ -214,9 +227,7 @@ const Register = () => {
                 />
               </div>
 
-              <div className=" mb-2 card-header">
-                
-              </div>
+              <div className=" mb-2 card-header"></div>
               <div className="mb-2">
                 <label htmlFor="role" className="form-label">
                   Role:
@@ -237,30 +248,18 @@ const Register = () => {
                   ))}
                 </select>
               </div>
-              <div className="mb-3">
-                  <label htmlFor="captcha" className="form-label">
-                    CAPTCHA:
-                  </label>
-                  <div className="d-flex align-items-center mb-2">
-                    <span className="me-2 p-2 border rounded bg-light">
-                      {captcha}
-                    </span>
-                    <button type="button" onClick={fetchCaptcha} className="btn btn-secondary btn-sm">
-                      Refresh CAPTCHA
-                    </button>
-                  </div>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="captcha"
-                    placeholder="Enter CAPTCHA"
-                    name="captcha"
-                    value={user.captcha}
-                    onChange={handleText}
-                    required
-                  />
+              <div className="container">
+                <div className="form-group">
+                    <div className="col mt-3">
+                        <LoadCanvasTemplate />
+                    </div>
+                    <div className="col mt-3">
+                        <input placeholder="Enter Captcha Value" id="user_captcha_input" name="user_captcha_input" type="text" />
+                    </div>
                 </div>
-
+            </div>
+              
+              
               {msg && (
                 <div
                   className={`alert ${
@@ -270,7 +269,7 @@ const Register = () => {
                   {msg}
                 </div>
               )}
-              <button type="submit" className="btn btn-primary w-100">
+              <button type="submit" className="btn btn-primary w-100 mt-2"  onClick={doSubmit} >
                 Register
               </button>
             </form>
