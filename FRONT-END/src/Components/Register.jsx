@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import MainService from "../Services/MainService";
-import { loadCaptchaEnginge, LoadCanvasTemplate, validateCaptcha } from 'react-simple-captcha';
-
-
+import {
+  loadCaptchaEnginge,
+  LoadCanvasTemplate,
+  validateCaptcha,
+} from "react-simple-captcha";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -31,16 +33,16 @@ const Register = () => {
   useEffect(() => {
     MainService.getRoles()
       .then((response) => {
-        console.log("Role fetched:", response.data); // check in console data role all
         setRoles(response.data);
       })
       .catch((error) => {
         console.error("Error fetching roles:", error);
       });
-
-    
   }, []);
-  
+
+  useEffect(() => {
+    loadCaptchaEnginge(6);
+  }, []);
 
   const handleText = (event) => {
     const { name, value } = event.target;
@@ -60,54 +62,86 @@ const Register = () => {
     }
   };
 
-  const saveUser = (event) => {
-    event.preventDefault();
-    const form = event.currentTarget;
-    if (
-      form.checkValidity() === false ||
-      user.password !== user.confirmPassword
-    ) {
-      event.stopPropagation();
-      if (user.password !== user.confirmPassword) {
-        setMsg("Passwords do not match.");
-        setMsgType("error");
-      }
-    } else {
-      MainService.AddUser(user)
-        .then((res) => {
-          setMsg("User added successfully...");
-          setMsgType("success");
-          console.log("User added:", res.data);
-          setTimeout(() => {
-            navigate("/emailverification", { state: { email: user.email } }); // Pass email in state
-          }, 2000);
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-          setMsg("Failed to add User. Please try again.");
-          setMsgType("error");
-        });
-    }
-    setValidated(true);
+  const validateEmail = (email) => {
+    const re = /\S+@\S+\.\S+/;
+    return re.test(email);
   };
 
+  const validateContact = (contact) => {
+    const re = /^[0-9]{10}$/;
+    return re.test(contact);
+  };
 
-  useEffect(() => {
-    loadCaptchaEnginge(6); 
-}, []);
+  const validatePassword = (password) => {
+    return password.length >= 8;
+  };
 
-const doSubmit = () => {
-  let user_captcha = document.getElementById('user_captcha_input').value;
+  const validateForm = () => {
+    if (!user.FirstName || !user.LastName) {
+      setMsg("First and Last Name are required.");
+      setMsgType("error");
+      return false;
+    }
+    if (!validateEmail(user.email)) {
+      setMsg("Invalid email format.");
+      setMsgType("error");
+      return false;
+    }
+    if (!validateContact(user.contact)) {
+      setMsg("Contact must be 10 digits.");
+      setMsgType("error");
+      return false;
+    }
+    if (!validatePassword(user.password)) {
+      setMsg("Password must be at least 8 characters long.");
+      setMsgType("error");
+      return false;
+    }
+    if (user.password !== user.confirmPassword) {
+      setMsg("Passwords do not match.");
+      setMsgType("error");
+      return false;
+    }
+    if (!validateCaptcha(user.captcha)) {
+      setMsg("Captcha does not match.");
+      setMsgType("error");
+      return false;
+    }
+    return true;
+  };
 
-  if (validateCaptcha(user_captcha) === true) {
-      alert('Captcha Matched');
-      loadCaptchaEnginge(6); 
-      document.getElementById('user_captcha_input').value = "";
-  } else {
-      alert('Captcha Does Not Match');
-      document.getElementById('user_captcha_input').value = "";
-  }
-}
+  const saveUser = (event) => {
+    event.preventDefault();
+    if (!validateForm()) {
+      setValidated(true);
+      return;
+    }
+    MainService.AddUser(user)
+      .then((res) => {
+        setMsg("User added successfully...");
+        setMsgType("success");
+        setTimeout(() => {
+          navigate("/emailverification", { state: { email: user.email } });
+        }, 2000);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        setMsg("Failed to add User. Please try again.");
+        setMsgType("error");
+      });
+  };
+
+  const doSubmit = () => {
+    let user_captcha = document.getElementById("user_captcha_input").value;
+    if (validateCaptcha(user_captcha) === true) {
+      alert("Captcha Matched");
+      loadCaptchaEnginge(6);
+      document.getElementById("user_captcha_input").value = "";
+    } else {
+      alert("Captcha Does Not Match");
+      document.getElementById("user_captcha_input").value = "";
+    }
+  };
 
   return (
     <div className="container ">
@@ -122,7 +156,7 @@ const doSubmit = () => {
             </div>
             <form onSubmit={saveUser} noValidate>
               <div className="mb-2">
-                <label htmlFor="name" className="form-label">
+                <label htmlFor="firstname" className="form-label">
                   First Name:
                 </label>
                 <input
@@ -130,14 +164,14 @@ const doSubmit = () => {
                   className="form-control"
                   id="firstname"
                   placeholder="Enter first name"
-                  name="firstname"
+                  name="FirstName"
                   value={user.FirstName}
                   onChange={handleText}
                   required
                 />
               </div>
               <div className="mb-2">
-                <label htmlFor="name" className="form-label">
+                <label htmlFor="middlename" className="form-label">
                   Middle Name:
                 </label>
                 <input
@@ -145,14 +179,13 @@ const doSubmit = () => {
                   className="form-control"
                   id="middlename"
                   placeholder="Enter Middle Name"
-                  name="middlename"
+                  name="MiddleName"
                   value={user.MiddleName}
                   onChange={handleText}
-                  required
                 />
               </div>
               <div className="mb-2">
-                <label htmlFor="name" className="form-label">
+                <label htmlFor="lastname" className="form-label">
                   Last Name:
                 </label>
                 <input
@@ -160,7 +193,7 @@ const doSubmit = () => {
                   className="form-control"
                   id="lastname"
                   placeholder="Enter Last name"
-                  name="lastname"
+                  name="LastName"
                   value={user.LastName}
                   onChange={handleText}
                   required
@@ -226,7 +259,6 @@ const doSubmit = () => {
                   required
                 />
               </div>
-
               <div className=" mb-2 card-header"></div>
               <div className="mb-2">
                 <label htmlFor="role" className="form-label">
@@ -250,16 +282,23 @@ const doSubmit = () => {
               </div>
               <div className="container">
                 <div className="form-group">
-                    <div className="col mt-3">
-                        <LoadCanvasTemplate />
-                    </div>
-                    <div className="col mt-3">
-                        <input placeholder="Enter Captcha Value" id="user_captcha_input" name="user_captcha_input" type="text" />
-                    </div>
+                  <div className="col mt-3">
+                    <LoadCanvasTemplate />
+                  </div>
+                  <div className="col mt-3">
+                    <input
+                      placeholder="Enter Captcha Value"
+                      id="user_captcha_input"
+                      name="captcha"
+                      type="text"
+                      value={user.captcha}
+                      onChange={handleText}
+                      required
+                    />
+                  </div>
                 </div>
-            </div>
-              
-              
+              </div>
+
               {msg && (
                 <div
                   className={`alert ${
@@ -269,7 +308,7 @@ const doSubmit = () => {
                   {msg}
                 </div>
               )}
-              <button type="submit" className="btn btn-primary w-100 mt-2"  onClick={doSubmit} >
+              <button type="submit" className="btn btn-primary w-100 mt-2">
                 Register
               </button>
             </form>
